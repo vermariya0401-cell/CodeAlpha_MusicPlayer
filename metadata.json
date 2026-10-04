@@ -1,0 +1,6 @@
+{
+  "name": "Nova Beat - Vanilla JS Music Player",
+  "description": "A modern, responsive dark-themed music player built with pure HTML5, CSS3, and Vanilla JavaScript with playlist, seek bar, and volume controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

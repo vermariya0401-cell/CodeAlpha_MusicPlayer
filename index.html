@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaBeat - Local 3D Music Player</title>
+  <meta name="description" content="NovaBeat - A premium 3D dark-themed local music player built with pure HTML5, CSS3, and Vanilla JavaScript.">
+  <meta property="og:title" content="NovaBeat">
+  <meta property="og:description" content="NovaBeat - A premium 3D dark-themed local music player.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Animated Dynamic 3D Studio Background -->
+  <div class="ambient-bg-wrapper" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-dynamic" id="dynamicOrb"></div>
+    <div class="ambient-grid"></div>
+  </div>
+
+  <!-- Top App Navigation / Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">NovaBeat</h1>
+    </div>
+
+    <!-- Quick Add Music in Header -->
+    <div class="header-actions">
+      <button id="quickAddBtn" class="header-add-btn" title="Add music files from your computer">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        <span>+ Add Music</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Error Notification Banner (Friendly alert for missing audio files) -->
+  <div id="errorBanner" class="error-banner hidden" role="alert">
+    <div class="error-banner-content">
+      <svg class="error-banner-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <span id="errorMessageText"><strong>Notice:</strong> Unable to play audio file.</span>
+    </div>
+    <button id="errorCloseBtn" class="error-close-btn" title="Dismiss error" aria-label="Close message">&times;</button>
+  </div>
+
+  <!-- Main 3D Perspective Stage -->
+  <main class="main-content">
+    <div class="player-layout">
+
+      <!-- LEFT COLUMN: 3D Floating Music Player Card -->
+      <section class="player-card" id="playerCard" aria-label="Music Player">
+        
+        <!-- Soft Radial Mouse Follow Illumination Light -->
+        <div class="mouse-light-overlay" id="mouseLightOverlay" aria-hidden="true"></div>
+
+        <!-- Specular Glare Sheen Layer -->
+        <div class="card-glare" id="cardGlare" aria-hidden="true"></div>
+
+        <!-- 3D Album Artwork Section & Rotating Multi-Layer Vinyl Disc -->
+        <div class="artwork-wrapper" id="artworkWrapper">
+          <div id="artworkCanvas" class="artwork-canvas art-theme-1"></div>
+          
+          <!-- Realistic 3D Vinyl Disc with Layered Depth -->
+          <div class="vinyl-disc" id="vinylDisc" aria-hidden="true">
+            <div class="vinyl-groove-ring ring-outer"></div>
+            <div class="vinyl-groove-ring ring-middle"></div>
+            <div class="vinyl-center">
+              <div class="vinyl-spindle"></div>
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Prominent Visualizer Overlay on Artwork -->
+          <div class="visualizer-overlay" aria-hidden="true">
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+            <div class="visualizer-bar"></div>
+          </div>
+
+          <!-- Track Counter Badge -->
+          <span id="trackBadge" class="track-badge">Track 1 of 5</span>
+        </div>
+
+        <!-- Song Title, Artist & Audio Visualizer Equalizer -->
+        <div class="song-info" id="songInfo">
+          <h2 id="songTitle" class="song-title">Midnight Drive</h2>
+          <p id="artistName" class="artist-name">Nova Waves</p>
+          
+          <!-- Clearly Visible Equalizer (Synchronized with Play State) -->
+          <div class="center-visualizer-strip" aria-label="Audio Visualizer">
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+            <div class="center-vis-bar"></div>
+          </div>
+        </div>
+
+        <!-- Interactive 3D Progress / Seek Bar -->
+        <div class="progress-section">
+          <!-- Hover Timestamp Tooltip -->
+          <div id="progressHoverTooltip" class="progress-hover-tooltip">0:00</div>
+
+          <div class="progress-container" id="progressContainer" role="slider" aria-label="Audio Seek Bar" aria-valuemin="0" aria-valuemax="100" tabindex="0">
+            <div class="progress-bar-bg">
+              <div id="progressBar" class="progress-bar-fill"></div>
+              <div class="progress-handle"></div>
+            </div>
+          </div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span>
+            <span id="totalDuration">0:00</span>
+          </div>
+        </div>
+
+        <!-- Tactile 3D Playback Controls -->
+        <div class="controls-row">
+          <button id="prevBtn" class="control-btn secondary-btn" title="Previous Song" aria-label="Previous Song">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+
+          <button id="playBtn" class="control-btn play-btn" title="Play" aria-label="Play">
+            <span id="playIcon">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </span>
+          </button>
+
+          <button id="nextBtn" class="control-btn secondary-btn" title="Next Song" aria-label="Next Song">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Tactile 3D Volume & Mute Section -->
+        <div class="volume-section">
+          <button id="muteBtn" class="control-btn icon-btn" title="Mute" aria-label="Mute or Unmute">
+            <span id="volumeIcon">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+              </svg>
+            </span>
+          </button>
+          <input 
+            type="range" 
+            id="volumeSlider" 
+            class="volume-slider" 
+            min="0" 
+            max="1" 
+            step="0.01" 
+            value="0.8" 
+            title="Volume Slider" 
+            aria-label="Volume Slider"
+          >
+          <span id="volumePercent" class="volume-percent">80%</span>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Local Music Hub & 3D Playlists -->
+      <section class="playlist-card" aria-label="My Music">
+        
+        <!-- Section Header with Primary Actions -->
+        <div class="playlist-header">
+          <div class="playlist-title-group">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+            <h3 class="playlist-title" id="playlistMainTitle">MY MUSIC</h3>
+          </div>
+          <span id="trackCountBadge" class="playlist-count">5 Tracks</span>
+        </div>
+
+        <!-- Action Toolbar: + Add Music & + Create Playlist -->
+        <div class="actions-toolbar">
+          <button id="addMusicBtn" class="action-btn primary-action-btn" title="Select audio files from your computer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span>+ Add Music</span>
+          </button>
+
+          <button id="createPlaylistBtn" class="action-btn secondary-action-btn" title="Create a new playlist from selected songs">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z"/>
+            </svg>
+            <span>+ Create Playlist</span>
+          </button>
+
+          <!-- Hidden Native File Picker -->
+          <input 
+            type="file" 
+            id="audioFileInput" 
+            accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac" 
+            multiple 
+            style="display:none;" 
+            aria-label="Select audio files"
+          >
+        </div>
+
+        <!-- Playlist Filter Tabs (All Music, Favorites, Playlists, Demos) -->
+        <div class="playlist-tabs-bar" id="playlistTabsBar" role="tablist">
+          <button class="tab-pill active" data-tab="all" role="tab" aria-selected="true">All Music</button>
+          <button class="tab-pill" data-tab="favorites" role="tab" aria-selected="false">♥ Favorites</button>
+          <button class="tab-pill" data-tab="demos" role="tab" aria-selected="false">🎵 Demos</button>
+        </div>
+
+        <!-- Search & Sort Controls -->
+        <div class="search-sort-bar">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="search-input" 
+              placeholder="Search your music..." 
+              aria-label="Search your music"
+            >
+            <button id="clearSearchBtn" class="clear-search-btn" title="Clear search" style="display:none;">&times;</button>
+          </div>
+
+          <div class="sort-wrapper">
+            <select id="sortSelect" class="sort-select" aria-label="Sort music list">
+              <option value="recent">Recently Added</option>
+              <option value="az">Title A &rarr; Z</option>
+              <option value="za">Title Z &rarr; A</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rendered Songs List -->
+        <ul id="playlist" class="playlist-list" role="list">
+          <!-- Dynamically populated via script.js -->
+        </ul>
+
+        <!-- Empty State (Shown when no songs match or list is empty) -->
+        <div id="emptyPlaylistState" class="empty-playlist-state" style="display:none;">
+          <div class="empty-icon-wrap">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+          </div>
+          <h4 class="empty-title">No Songs in this view</h4>
+          <p class="empty-subtitle">Click <strong>+ Add Music</strong> to select songs directly from your computer.</p>
+        </div>
+
+        <!-- Local Privacy Note -->
+        <div class="privacy-note">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+          <span>Local files stay 100% on your device. Never uploaded to any server.</span>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Create Playlist Modal -->
+  <div id="playlistModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="playlistModalTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="playlistModalTitle" class="modal-title">Create New Playlist</h3>
+        <button id="closePlaylistModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Organize your selected songs into custom playlists (e.g. <em>Workout</em>, <em>Chill</em>, <em>Roadtrip</em>).</p>
+        <div class="modal-form-group">
+          <label for="newPlaylistNameInput" class="modal-label">Playlist Name</label>
+          <input 
+            type="text" 
+            id="newPlaylistNameInput" 
+            class="modal-input" 
+            placeholder="e.g. Chill Beats" 
+            maxlength="30"
+          >
+        </div>
+        <div class="modal-actions">
+          <button id="cancelPlaylistBtn" class="modal-btn modal-btn-cancel">Cancel</button>
+          <button id="confirmCreatePlaylistBtn" class="modal-btn modal-btn-create">Create Playlist</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vanilla JavaScript Linking -->
+  <script src="./script.js"></script>
+</body>
+</html>
